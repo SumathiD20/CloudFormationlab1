@@ -4,6 +4,11 @@ Parameters:
     Type: String
     Default: 10.24.0.0/16
 
+  PublicSubnetCidrBlock:
+    Description: Parameter for Public Subnet Cidr
+    Type: String
+    Default: 10.24.0.0/24
+
 Resources:
   myLab1VPC:
     Type: AWS::EC2::VPC
@@ -23,9 +28,41 @@ Resources:
       - Key: Name
         Value: Lab1-InternetGateway
 
-  AttachGateway:
+  mylab1AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref myInternetGateway
+      VpcId: !Ref myLab1VPC
+      InternetGatewayId: !Ref myLab1InternetGateway
+  
+  myLab1PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myLab1VPC
+      CidrBlock: !Ref PublicSubnetCidrBlock
+      AvailabilityZone: "us-east-1a"
+      Tags:
+      - Key: Name
+        Value: Lab1-PublicSubnet
+
+  myLab1PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myLab1VPC
+      Tags:
+      - Key: Name
+        Value: Lab1-PublicRouteTable
+
+  myLab1PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref myLab1PublicSubnet
+      RouteTableId: !Ref myLab1PublicRouteTable
+
+  myLab1PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: myLab1InternetGateway                                  #To be found only after Internet Gateway successfully attached to the VPC
+    Properties:
+       RouteTableId: !Ref myLab1PublicRouteTable
+       DestinationCidrBlock: 0.0.0.0/0                                 #Specifies the Destination match
+       GatewayId: !Ref myLab1InternetGateway
 
