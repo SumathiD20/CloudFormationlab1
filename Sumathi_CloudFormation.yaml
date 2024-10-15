@@ -9,6 +9,12 @@ Parameters:
     Type: String
     Default: 10.24.0.0/24
 
+  PrivateSubnetCidrBlock:
+    Description: Parameter for Private Subnet Cidr
+    Type: String
+    Default: 10.24.1.0/24
+
+
 Resources:
   myLab1VPC:
     Type: AWS::EC2::VPC
@@ -34,7 +40,7 @@ Resources:
       VpcId: !Ref myLab1VPC
       InternetGatewayId: !Ref myLab1InternetGateway
   
-  myLab1PublicSubnet:
+  myLab1PublicSubnet:                                              ### Public Subnet ###
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref myLab1VPC
@@ -43,7 +49,18 @@ Resources:
       Tags:
       - Key: Name
         Value: Lab1-PublicSubnet
+  
+  myLab1PrivateSubnet:                                              ### Private Subnet ###
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myLab1VPC
+      CidrBlock: !Ref PrivateSubnetCidrBlock
+      AvailabilityZone: "us-east-1a"
+      Tags:
+      - Key: Name
+        Value: Lab1-PrivateSubnet
 
+### Public Subnet Routing ###
   myLab1PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -65,4 +82,19 @@ Resources:
        RouteTableId: !Ref myLab1PublicRouteTable
        DestinationCidrBlock: 0.0.0.0/0                                 #Specifies the Destination match
        GatewayId: !Ref myLab1InternetGateway
+
+### Private Subnet Routing ###
+  myLab1PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref myLab1VPC
+      Tags:
+      - Key: Name
+        Value: Lab1-PrivateRouteTable
+
+  myLab1PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref myLab1PrivateSubnet
+      RouteTableId: !Ref myLab1PrivateRouteTable
 
