@@ -8,12 +8,10 @@ Parameters:
     Description: Parameter for Public Subnet Cidr
     Type: String
     Default: 10.24.0.0/24
-
   PrivateSubnetCidrBlock:
     Description: Parameter for Private Subnet Cidr
     Type: String
     Default: 10.24.1.0/24
-
 
 Resources:
   myLab1VPC:
@@ -40,27 +38,17 @@ Resources:
       VpcId: !Ref myLab1VPC
       InternetGatewayId: !Ref myLab1InternetGateway
   
-  myLab1PublicSubnet:                                              ### Public Subnet ###
+  myLab1PublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref myLab1VPC
+      MapPublicIpOnLaunch: 'false'                   # To automatically Launch IP address
       CidrBlock: !Ref PublicSubnetCidrBlock
       AvailabilityZone: "us-east-1a"
       Tags:
       - Key: Name
         Value: Lab1-PublicSubnet
-  
-  myLab1PrivateSubnet:                                              ### Private Subnet ###
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref myLab1VPC
-      CidrBlock: !Ref PrivateSubnetCidrBlock
-      AvailabilityZone: "us-east-1a"
-      Tags:
-      - Key: Name
-        Value: Lab1-PrivateSubnet
 
-### Public Subnet Routing ###
   myLab1PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -84,6 +72,16 @@ Resources:
        GatewayId: !Ref myLab1InternetGateway
 
 ### Private Subnet Routing ###
+  myLab1PrivateSubnet:                                              ### Private Subnet ###
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref myLab1VPC
+      CidrBlock: !Ref PrivateSubnetCidrBlock
+      AvailabilityZone: "us-east-1a"
+      Tags:
+      - Key: Name
+        Value: Lab1-PrivateSubnet
+
   myLab1PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -98,3 +96,67 @@ Resources:
       SubnetId: !Ref myLab1PrivateSubnet
       RouteTableId: !Ref myLab1PrivateRouteTable
 
+  # Security Group for the Public EC2 instance in public subnet
+  myLab1PublicEC2InstanceSGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows SSH access to the public EC2 instance
+      VpcId: !Ref myLab1VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  # Security Group for the Private EC2 instance in private subnet
+  myLab1PrivateEC2InstanceSGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access from the Public instance
+      VpcId: !Ref myLab1VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref myLab1PublicEC2InstanceSGrp
+
+  # Implementing Public EC2 Instance
+  myLab1PublicEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0fff1b9a61dec8a5f  # AMI ID of us-east-1 zone for Amazon Linux
+      SubnetId: !Ref myLab1PublicSubnet
+      SecurityGroupIds:
+        - !Ref myLab1PublicEC2InstanceSGrp
+
+  # Implementing Private EC2 Instance
+  myLab1PrivateEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0fff1b9a61dec8a5f  # AMI ID of us-east-1 zone for Amazon Linux
+      SubnetId: !Ref myLab1PrivateSubnet
+      SecurityGroupIds:
+        - !Ref myLab1PrivateEC2InstanceSGrp
+
+  # Security Group for Jump Host
+  myLab1JumpBoxSGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows to SSH to the Jump Host
+      VpcId: !Ref myLab1VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.24.0.0/24  # Allow SSH from Public Subnet
+  # Jump Host in Public Subnet
+  JumpBox:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0fff1b9a61dec8a5f  # Replace with a valid AMI ID in your region
+      SubnetId: !Ref myLab1PublicSubnet
+      SecurityGroupIds:
+        - !Ref myLab1JumpBoxSGrp
