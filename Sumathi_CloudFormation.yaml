@@ -98,6 +98,7 @@ Resources:
       - Key: Name
         Value: Lab1-PrivateRouteTable
 
+
   myLab1PrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -129,7 +130,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          SourceSecurityGroupId: !Ref myLab1PublicEC2InstanceSGrp
+          SourceSecurityGroupId: !Ref myLab1JumpBoxSGrp
       Tags:
         - Key: Name
           Value: Lab1-PrivateEC2SGrp
