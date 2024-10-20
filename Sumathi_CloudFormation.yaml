@@ -115,6 +115,9 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: Lab1-PublicEC2SGrp
 
   # Security Group for the Private EC2 instance in private subnet
   myLab1PrivateEC2InstanceSGrp:
@@ -127,6 +130,9 @@ Resources:
           FromPort: 22
           ToPort: 22
           SourceSecurityGroupId: !Ref myLab1PublicEC2InstanceSGrp
+      Tags:
+        - Key: Name
+          Value: Lab1-PrivateEC2SGrp
 
   # Implementing Public EC2 Instance
   myLab1PublicEC2Instance:
@@ -138,6 +144,9 @@ Resources:
       SubnetId: !Ref myLab1PublicSubnet
       SecurityGroupIds:
         - !Ref myLab1PublicEC2InstanceSGrp
+      Tags:
+        - Key: Name
+          Value: Lab1-PublicEC2Instance
 
   # Implementing Private EC2 Instance
   myLab1PrivateEC2Instance:
@@ -149,6 +158,9 @@ Resources:
       SubnetId: !Ref myLab1PrivateSubnet
       SecurityGroupIds:
         - !Ref myLab1PrivateEC2InstanceSGrp
+      Tags:
+        - Key: Name
+          Value: Lab1-PrivateEc2Instance
 
   # Security Group for Jump Host
   myLab1JumpBoxSGrp:
@@ -161,6 +173,9 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0  # Allow SSH from Public Subnet ( Recommended to use VPN range in organization )
+      Tags:
+        - Key: Name
+          Value: Lab1-JumpBoxEC2SGrp
   # Jump Host in Public Subnet
   JumpBox:
     Type: AWS::EC2::Instance
@@ -171,3 +186,6 @@ Resources:
       SubnetId: !Ref myLab1PublicSubnet
       SecurityGroupIds:
         - !Ref myLab1JumpBoxSGrp
+      Tags:
+        - Key: Name
+          Value: Lab1-JumpBox
