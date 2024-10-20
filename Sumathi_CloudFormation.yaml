@@ -139,7 +139,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      #KeyName: sumathi_key_1.pem
+      KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
       SubnetId: !Ref myLab1PublicSubnet
       SecurityGroupIds:
@@ -153,7 +153,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      #KeyName: sumathi_key_1.pem
+      KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
       SubnetId: !Ref myLab1PrivateSubnet
       SecurityGroupIds:
@@ -181,7 +181,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      #KeyName: sumathi_key_1.pem
+      KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
       SubnetId: !Ref myLab1PublicSubnet
       SecurityGroupIds:
