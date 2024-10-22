@@ -22,7 +22,7 @@ Mappings:
 
 
 Resources:
-  myLab1VPC:
+  Lab1FridayHITTVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCidrparamBlock
@@ -33,23 +33,23 @@ Resources:
          Value: Lab1-VPC
 
 
-  myLab1InternetGateway:
+  Lab1FridayHITTInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
       - Key: Name
         Value: Lab1-InternetGateway
 
-  mylab1AttachGateway:
+  lab1FridayHITTAttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref myLab1VPC
-      InternetGatewayId: !Ref myLab1InternetGateway
+      VpcId: !Ref Lab1FridayHITTVPC
+      InternetGatewayId: !Ref Lab1FridayHITTInternetGateway
   
-  myLab1PublicSubnet:
+  Lab1FridayHITTPublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       MapPublicIpOnLaunch: 'true'                   # To automatically Launch IP address
       CidrBlock: !Ref PublicSubnetCidrBlock
       AvailabilityZone: !Select [1, !GetAZs '']
@@ -57,118 +57,126 @@ Resources:
       - Key: Name
         Value: Lab1-PublicSubnet
 
-  myLab1PublicRouteTable:
+  Lab1FridayHITTPublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       Tags:
       - Key: Name
         Value: Lab1-PublicRouteTable
 
-  myLab1PublicSubnetRouteTableAssociation:
+  Lab1FridayHITTPublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref myLab1PublicSubnet
-      RouteTableId: !Ref myLab1PublicRouteTable
+      SubnetId: !Ref Lab1FridayHITTPublicSubnet
+      RouteTableId: !Ref Lab1FridayHITTPublicRouteTable
 
-  myLab1PublicRoute:
+  Lab1FridayHITTPublicRoute:
     Type: AWS::EC2::Route
-    DependsOn: myLab1InternetGateway                                  #To be found only after Internet Gateway successfully attached to the VPC
+    DependsOn: Lab1FridayHITTInternetGateway                                  #To be found only after Internet Gateway successfully attached to the VPC
     Properties:
-       RouteTableId: !Ref myLab1PublicRouteTable
+       RouteTableId: !Ref Lab1FridayHITTPublicRouteTable
        DestinationCidrBlock: 0.0.0.0/0                                 #Specifies the Destination match
-       GatewayId: !Ref myLab1InternetGateway
+       GatewayId: !Ref Lab1FridayHITTInternetGateway
 
 ### Private Subnet Routing ###
-  myLab1PrivateSubnet:                                              ### Private Subnet ###
+  Lab1FridayHITTPrivateSubnet:                                              ### Private Subnet ###
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       CidrBlock: !Ref PrivateSubnetCidrBlock
       AvailabilityZone: !Select [1, !GetAZs '']
       Tags:
       - Key: Name
         Value: Lab1-PrivateSubnet
 
-  myLab1PrivateRouteTable:
+  Lab1FridayHITTPrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       Tags:
       - Key: Name
         Value: Lab1-PrivateRouteTable
 
 
-  myLab1PrivateSubnetRouteTableAssociation:
+  Lab1FridayHITTPrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref myLab1PrivateSubnet
-      RouteTableId: !Ref myLab1PrivateRouteTable
+      SubnetId: !Ref Lab1FridayHITTPrivateSubnet
+      RouteTableId: !Ref Lab1FridayHITTPrivateRouteTable
 
   # Security Group for the Public EC2 instance in public subnet
-  myLab1PublicEC2InstanceSGrp:
+  Lab1FridayHITTPublicEC2InstanceSGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows SSH access to the public EC2 instance
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
+        - IpProtocol: tcp                      # To Allow SSH
           FromPort: 22
           ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp                      # To allow HTTP
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp                      # To allow HTTPS
+          FromPort: 443
+          ToPort: 443
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: Lab1-PublicEC2SGrp
 
   # Security Group for the Private EC2 instance in private subnet
-  myLab1PrivateEC2InstanceSGrp:
+  Lab1FridayHITTPrivateEC2InstanceSGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow SSH access from the Public instance
-      VpcId: !Ref myLab1VPC
+      GroupDescription: Allow SSH access from the Public instancecat 
+      VpcId: !Ref Lab1FridayHITTVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          SourceSecurityGroupId: !Ref myLab1JumpBoxSGrp
+          SourceSecurityGroupId: !Ref Lab1FridayHITTJumpBoxSGrp
       Tags:
         - Key: Name
           Value: Lab1-PrivateEC2SGrp
 
   # Implementing Public EC2 Instance
-  myLab1PublicEC2Instance:
+  Lab1FridayHITTPublicEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
       KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
-      SubnetId: !Ref myLab1PublicSubnet
+      SubnetId: !Ref Lab1FridayHITTPublicSubnet
       SecurityGroupIds:
-        - !Ref myLab1PublicEC2InstanceSGrp
+        - !Ref Lab1FridayHITTPublicEC2InstanceSGrp
       Tags:
         - Key: Name
           Value: Lab1-PublicEC2Instance
 
   # Implementing Private EC2 Instance
-  myLab1PrivateEC2Instance:
+  Lab1FridayHITTPrivateEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
       KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
-      SubnetId: !Ref myLab1PrivateSubnet
+      SubnetId: !Ref Lab1FridayHITTPrivateSubnet
       SecurityGroupIds:
-        - !Ref myLab1PrivateEC2InstanceSGrp
+        - !Ref Lab1FridayHITTPrivateEC2InstanceSGrp
       Tags:
         - Key: Name
           Value: Lab1-PrivateEc2Instance
 
   # Security Group for Jump Host
-  myLab1JumpBoxSGrp:
+  Lab1FridayHITTJumpBoxSGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows to SSH to the Jump Host
-      VpcId: !Ref myLab1VPC
+      VpcId: !Ref Lab1FridayHITTVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -178,15 +186,30 @@ Resources:
         - Key: Name
           Value: Lab1-JumpBoxEC2SGrp
   # Jump Host in Public Subnet
-  JumpBox:
+  Lab1FridayHITTJumpBox:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
       KeyName: FridayHITTP_project
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]  # Select AMI ID depending on the region
-      SubnetId: !Ref myLab1PublicSubnet
+      SubnetId: !Ref Lab1FridayHITTPublicSubnet
       SecurityGroupIds:
-        - !Ref myLab1JumpBoxSGrp
+        - !Ref Lab1FridayHITTJumpBoxSGrp
       Tags:
         - Key: Name
           Value: Lab1-JumpBox
+
+Outputs:
+  VpcId:
+    Description: VPC ID of FridayHITT company
+    Value: !Ref Lab1FridayHITTVPC
+  InternetGateway:
+    Value: !Ref Lab1FridayHITTInternetGateway
+  PublicSubnet:
+    Value: !Ref Lab1FridayHITTPublicSubnet
+  PrivateSubnet:
+    Value: !Ref Lab1FridayHITTPrivateSubnet
+  PublicInstancePublicIP:
+    Value: !GetAtt Lab1FridayHITTPublicEC2Instance.PublicIp
+  JumpBoxInstancePublicIP:
+    Value: !GetAtt Lab1FridayHITTJumpBox.PublicIp
