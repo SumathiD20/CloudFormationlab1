@@ -124,6 +124,10 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: 0
+          CidrIp: 10.24.0.0/24
       Tags:
         - Key: Name
           Value: Lab1-PublicEC2SGrp
@@ -139,6 +143,10 @@ Resources:
           FromPort: 22
           ToPort: 22
           SourceSecurityGroupId: !Ref Lab1FridayHITTJumpBoxSGrp
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: 0
+          CidrIp: 10.24.0.0/24
       Tags:
         - Key: Name
           Value: Lab1-PrivateEC2SGrp
@@ -182,6 +190,10 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0  # Allow SSH from Public Subnet ( Recommended to use VPN range in organization )
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: Lab1-JumpBoxEC2SGrp
@@ -204,12 +216,28 @@ Outputs:
     Description: VPC ID of FridayHITT company
     Value: !Ref Lab1FridayHITTVPC
   InternetGateway:
+    Description: Internet Gateway for FridayHITT company VPC
     Value: !Ref Lab1FridayHITTInternetGateway
   PublicSubnet:
+    Description: Public Subnet of FridayHITT company VPC
     Value: !Ref Lab1FridayHITTPublicSubnet
   PrivateSubnet:
+    Description: Private Subnet of FridayHITT company VPC
     Value: !Ref Lab1FridayHITTPrivateSubnet
   PublicInstancePublicIP:
+    Description: Public IP of Public Instance in public Subnet
     Value: !GetAtt Lab1FridayHITTPublicEC2Instance.PublicIp
   JumpBoxInstancePublicIP:
+    Description: Public IP of Jump box Instance in public Subnet
     Value: !GetAtt Lab1FridayHITTJumpBox.PublicIp
+  PrivateEC2Instance:
+    Description: Private EC2 Instance in Private Subnet
+    Value: !Ref Lab1FridayHITTPrivateEC2Instance
+  PublicEC2Instance:
+    Description: Public EC2 Instance in Public Subnet
+    Value: !Ref Lab1FridayHITTPublicEC2Instance
+  JumpboxEC2Instance:
+    Description: Jump box EC2 Instance in Public Subnet
+    Value: !Ref Lab1FridayHITTJumpBox
+  
+  
