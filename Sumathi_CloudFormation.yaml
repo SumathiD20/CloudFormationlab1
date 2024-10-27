@@ -20,7 +20,7 @@ Mappings:
     us-west-1:
       AMI: ami-0cf4e1fcfd8494d5b
 
-
+# VPC for FridayHITT Company
 Resources:
   Lab1FridayHITTVPC:
     Type: AWS::EC2::VPC
@@ -32,7 +32,7 @@ Resources:
        - Key: Name
          Value: Lab1-VPC
 
-
+# Internet Gateway
   Lab1FridayHITTInternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -45,7 +45,8 @@ Resources:
     Properties:
       VpcId: !Ref Lab1FridayHITTVPC
       InternetGatewayId: !Ref Lab1FridayHITTInternetGateway
-  
+ 
+      ### Private Subnet Routing ### 
   Lab1FridayHITTPublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -127,7 +128,7 @@ Resources:
         - IpProtocol: icmp
           FromPort: 8
           ToPort: 0
-          CidrIp: 10.24.0.0/24
+          CidrIp: 10.24.1.0/24
       Tags:
         - Key: Name
           Value: Lab1-PublicEC2SGrp
